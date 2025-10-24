@@ -1,6 +1,7 @@
+# pylint: disable=too-few-public-methods
 """MCP Server"""
 
-from mcp.server.sdk import McpServer, api_route
+from mcp.server.sdk import McpServer, api_route  # pylint: disable=import-error
 from pydantic import BaseModel
 
 
@@ -19,6 +20,7 @@ class HelloWorldResponse(BaseModel):
 class MyMcpServer(McpServer):
     """MyMcpServer"""
 
+    # pylint: disable=useless-parent-delegation
     def __init__(self, host: str, port: int):
         super().__init__(host, port)
 

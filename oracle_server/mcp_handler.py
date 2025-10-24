@@ -3,7 +3,9 @@
 import re
 from oracle_server.tools import weather, calculator
 
+# todo: https://github.com/ajponte/babylon/issues/38
 # A simple in-memory conversation history
+# pylint: disable=global-variable-not-assigned
 conversation_history = []
 
 def handle_mcp_request(data):
@@ -36,5 +38,5 @@ def handle_mcp_request(data):
         conversation_history.append(f"Tool: {result}")
         return {"response": result}
 
-    conversation_history.append(f"Assistant: I can help with that.")
+    conversation_history.append("Assistant: I can help with that.")
     return {"response": "I can help with that."}
