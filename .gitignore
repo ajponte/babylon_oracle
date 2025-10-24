@@ -205,3 +205,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# JET Brains
+.idea/
+
+# Node Modules
+client/node_modules/

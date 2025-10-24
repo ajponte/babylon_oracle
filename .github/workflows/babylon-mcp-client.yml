@@ -1,0 +1,34 @@
+name: babylon-mcp-client
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ "20.x" ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Node.js ${{ matrix.node }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node }}
+
+    - name: Install npm dependencies
+      run: npm install
+      working-directory: ./client
+
+    - name: Run tests
+      # NOTE: The test command in client/package.json is a placeholder.
+      # You will need to update it with your actual test command.
+      run: npm test
+      working-directory: ./client
