@@ -40,6 +40,9 @@ CONFIG_LOADERS: list[Loader] = [
     optional(key="CHROMA_SQLITE_DIR", default_val="./chromadb"),
     # A way to mark only a specific subset of collections to process for the daemon.
     optional(key="DATALAKE_COLLECTION_PREFIX", default_val="chase-data-"),
+    optional(key="MCP_SERVER_HOST", default_val="localhost"),
+    optional(key="MCP_SERVER_PORT", default_val="8080"),
+    optional(key="MCP_SERVER_URL", default_val="http://localhost:8080"),
 ]
 
 SECRETS_LOADERS: list[Loader] = [
