@@ -208,3 +208,6 @@ __marimo__/
 
 # JET Brains
 .idea/
+
+# Node Modules
+client/node_modules/

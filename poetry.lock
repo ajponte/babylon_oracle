@@ -263,6 +263,20 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-cors"
+version = "4.0.2"
+description = "A Flask extension adding a decorator for CORS support"
+optional = false
+python-versions = "*"
+files = [
+    {file = "Flask_Cors-4.0.2-py2.py3-none-any.whl", hash = "sha256:38364faf1a7a5d0a55bd1d2e2f83ee9e359039182f5e6a029557e1f56d92c09a"},
+    {file = "flask_cors-4.0.2.tar.gz", hash = "sha256:493b98e2d1e2f1a4720a7af25693ef2fe32fbafec09a2f72c59f3e475eda61d2"},
+]
+
+[package.dependencies]
+Flask = ">=0.9"
+
+[[package]]
 name = "hvac"
 version = "2.3.0"
 description = "HashiCorp Vault API client"
@@ -718,4 +732,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "770c02f18481354b4b18d3ef23f08804c858ab8f6088244f96e913968fa0f895"
+content-hash = "bb1da651d2f30b52dcde874f44bcfb36327a731acbee3ff354d4977939e55d96"
