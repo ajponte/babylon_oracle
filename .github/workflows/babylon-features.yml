@@ -40,6 +40,11 @@ jobs:
         pip install tox
         pip install poetry
 
+    - name: Install poetry dependencies
+      run: |
+        poetry install
+     
+
     - name: Run checks with tox
       run: |
         # Use '--skip-pkg-install' to prevent package re-installation 
