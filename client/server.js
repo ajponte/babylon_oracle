@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/chat', async (req, res) => {
-  var uri = 'http://${DEFAULT_MCP_HOST}:${MCP_SERVER_PORT}/${MCP_CHAT_URI}'
+  var uri = `http://${DEFAULT_MCP_HOST}:${MCP_SERVER_PORT}${MCP_CHAT_URI}`
   try {
     const response = await axios.post(
       uri,
