@@ -1,6 +1,8 @@
 const path = require('path');
 
-module.exports = {
+const config = {
+  name: 'browser',
+  mode: 'development',
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'public'),
@@ -21,3 +23,5 @@ module.exports = {
     ],
   },
 };
+
+module.exports = config;
