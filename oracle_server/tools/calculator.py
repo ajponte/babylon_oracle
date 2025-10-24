@@ -2,6 +2,7 @@
 Calculator tool for demonstration purposes.
 """
 
+
 def calculate(expression):
     """Calculate a mathematical expression."""
     try:

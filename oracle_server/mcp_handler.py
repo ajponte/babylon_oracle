@@ -8,6 +8,7 @@ from oracle_server.tools import weather, calculator
 # pylint: disable=global-variable-not-assigned
 conversation_history = []
 
+
 def handle_mcp_request(data):
     """Handle MCP request."""
     global conversation_history
