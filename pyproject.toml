@@ -29,7 +29,7 @@ pytest="^8.4.1"
 
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "tox-poetry"]
+requires = ["poetry-core>=1.0.0", "tox-poetry", "poetry"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
