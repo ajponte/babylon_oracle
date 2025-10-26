@@ -124,6 +124,7 @@ class AbstractSecretsManager(ABC):
 
 class BaoSecretsManager(AbstractSecretsManager):
     """OpenBao implementation of `AbstractSecretsManager`."""
+
     _instance = None
     _client = None
     _cache = None
@@ -136,9 +137,7 @@ class BaoSecretsManager(AbstractSecretsManager):
         return cls._instance
 
     def add_secret(self, path: str, secret: dict) -> bool:
-        response: dict = self._client.add_secret_value(
-            path=path, secret=secret
-        )
+        response: dict = self._client.add_secret_value(path=path, secret=secret)
         if not response:
             _LOGGER.info("No response from client")
             return False

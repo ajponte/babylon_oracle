@@ -22,6 +22,7 @@ from oracle_server.logger import logs
 
 DEFAULT_SWAGGER_API_SOURCE = "_api.yml"
 
+
 def create_app() -> FlaskApp:
     """
     Create a new Flask app.
@@ -54,6 +55,7 @@ def create_app() -> FlaskApp:
 
     return app
 
+
 def get_api_spec_path(filename: str) -> Path:
     """
     Returns a pathlib.Path object for a given API spec filename.
@@ -74,6 +76,7 @@ def get_api_spec_path(filename: str) -> Path:
     # Return the Path object
     return api_spec_path
 
+
 # todo: Update for https://github.com/ajponte/babylon/issues/40
 # pylint: disable=unused-argument
 def decode_token(token) -> dict:
@@ -86,6 +89,7 @@ def decode_token(token) -> dict:
     """
     # todo
     return {}
+
 
 def _setup_logging(
     app: FlaskApp,
@@ -120,12 +124,14 @@ def _setup_logging(
         )
         return response
 
+
 def _setup_http_error_handling(app):
     _handle_error_unknown(app)
     # Add a catch-all handler for any exception that isn't handled by a more specific handler.
     _handle_base_exception(app)
     # Handler for 404 errors. This is to catch issues with connexion/swagger integration.
     _handle_not_found(app)
+
 
 def _handle_error_unknown(app: FlaskApp):
     """
@@ -140,6 +146,7 @@ def _handle_error_unknown(app: FlaskApp):
         }
         return jsonify(resp)
 
+
 def _handle_not_found(app: FlaskApp):
     """
     Handle 404 Not Found errors.
@@ -149,6 +156,7 @@ def _handle_not_found(app: FlaskApp):
     def handle_not_found_error(e):
         resp = {"message": f"Not Found: {str(e)}", "status": HTTPStatus.NOT_FOUND}
         return jsonify(resp), 404
+
 
 def _handle_base_exception(app: FlaskApp):
     """
@@ -162,6 +170,7 @@ def _handle_base_exception(app: FlaskApp):
             "status": HTTPStatus.INTERNAL_SERVER_ERROR,
         }
         return jsonify(resp), 500
+
 
 def _setup_config(app: FlaskApp):
     """

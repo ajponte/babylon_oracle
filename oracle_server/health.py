@@ -1,7 +1,9 @@
 """
 Custom /health route.
 """
+
 from flask import Flask
+
 
 def health():
     """
