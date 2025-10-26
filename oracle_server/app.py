@@ -38,6 +38,7 @@ def create_app() -> FlaskApp:
             pythonic_params=True,
             validate_responses=True,
             strict_validation=True,
+            options={"swagger_ui_path": "/ui"},
         )
         print("Successfully added API spec")
     except Exception as e:
@@ -45,13 +46,13 @@ def create_app() -> FlaskApp:
         sys.exit(1)  # Exit the application gracefully
 
     flask_app = app.app
-    _setup_logging(flask_app)
-    _setup_config(flask_app)
+    _setup_logging(app)
+    _setup_config(app)
     CORS(flask_app)
     setup_health_route(flask_app)
-    _setup_http_error_handling(flask_app)
+    _setup_http_error_handling(app)
 
-    return flask_app
+    return app
 
 def get_api_spec_path(filename: str) -> Path:
     """
@@ -87,16 +88,16 @@ def decode_token(token) -> dict:
     return {}
 
 def _setup_logging(
-    flask_app: Flask,
+    app: FlaskApp,
 ):
     """
     Setup logging.
     """
     # Init logs
-    logs.init_app(flask_app, log_level="DEBUG", log_type="stream")
+    logs.init_app(app.app, log_level="DEBUG", log_type="stream")
 
     # For request logging
-    @flask_app.after_request
+    @app.app.after_request
     def after_request(response):
         """
         Application logging.
@@ -119,19 +120,19 @@ def _setup_logging(
         )
         return response
 
-def _setup_http_error_handling(flask_app):
-    _handle_error_unknown(flask_app)
+def _setup_http_error_handling(app):
+    _handle_error_unknown(app)
     # Add a catch-all handler for any exception that isn't handled by a more specific handler.
-    _handle_base_exception(flask_app)
+    _handle_base_exception(app)
     # Handler for 404 errors. This is to catch issues with connexion/swagger integration.
-    _handle_not_found(flask_app)
+    _handle_not_found(app)
 
-def _handle_error_unknown(flask_app: Flask):
+def _handle_error_unknown(app: FlaskApp):
     """
     Hande a response from the server when an unknown error is encountered.
     """
 
-    @flask_app.errorhandler(500)
+    @app.app.errorhandler(500)
     def error(e: Any | None):
         resp = {
             "message": f"Unknown server error: {str(e)}",
@@ -139,22 +140,22 @@ def _handle_error_unknown(flask_app: Flask):
         }
         return jsonify(resp)
 
-def _handle_not_found(flask_app: Flask):
+def _handle_not_found(app: FlaskApp):
     """
     Handle 404 Not Found errors.
     """
 
-    @flask_app.errorhandler(NotFound)
+    @app.app.errorhandler(NotFound)
     def handle_not_found_error(e):
         resp = {"message": f"Not Found: {str(e)}", "status": HTTPStatus.NOT_FOUND}
         return jsonify(resp), 404
 
-def _handle_base_exception(flask_app: Flask):
+def _handle_base_exception(app: FlaskApp):
     """
     Handle any base exception and return a generic 500 error response.
     """
 
-    @flask_app.errorhandler(Exception)
+    @app.app.errorhandler(Exception)
     def handle_base_exception(e):
         resp = {
             "message": f"A base exception was caught: {str(e)}",
@@ -162,13 +163,13 @@ def _handle_base_exception(flask_app: Flask):
         }
         return jsonify(resp), 500
 
-def _setup_config(flask_app: Flask):
+def _setup_config(app: FlaskApp):
     """
     Set up the flask app config.
 
-    :param flask_app: The flask app.
+    :param app: The connexion app.
     """
     config: dict[str, Any] = {}
     update_config_from_environment(config)
     update_config_from_secrets(config)
-    flask_app.config.from_mapping(config)
+    app.app.config.from_mapping(config)

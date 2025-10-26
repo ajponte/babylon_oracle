@@ -47,10 +47,6 @@ class OpenBaoApiClient:
     def __init__(self):
         """Constructor."""
         # todo: Add RSA cert
-        bao_addr = os.environ.get("BAO_ADDR", None)
-        token = os.environ.get("VAULT_TOKEN", None)
-        print(f"BAO_ADDR: {bao_addr}")
-        print(f"VAULT_TOKEN: {token}")
         self._client = hvac.Client(
             # `BAO_ADDR`, `VAULT_TOKEN` are the suggested env var names from Hashicorp.
             url=os.environ.get("BAO_ADDR", None),

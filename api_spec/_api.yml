@@ -17,7 +17,7 @@ paths:
     get:
       tags:
         - echo
-      operationId: server.controllers.echo.do_echo
+      operationId: oracle_server.controllers.echo.do_echo
       summary: Echo
       parameters:
         - name: inputVal
