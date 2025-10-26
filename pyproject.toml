@@ -10,7 +10,8 @@ readme = "README.md"
 python = "^3.13"
 
 # Web server
-Flask = "^3.1.2"
+connexion = { version = "^3.2.0", extras = ["flask", "swagger-ui", "uvicorn"] }
+#Flask = "^3.1.2"
 requests = "^2.32.5"
 
 # Secrets manager

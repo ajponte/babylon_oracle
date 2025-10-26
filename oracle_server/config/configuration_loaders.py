@@ -176,7 +176,7 @@ def required_secret(
              the loader as a higher-order function, which when invoked will
              return the key, value pair as a Tuple.
     """
-    path = path or os.environ["OPENBAO_SECRETS_PATH"]
+    path = os.environ["OPENBAO_SECRETS_PATH"]
 
     secrets_manager = BaoSecretsManager()
 
