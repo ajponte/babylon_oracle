@@ -19,13 +19,18 @@ hvac = "2.3.0"
 Flask-Cors = "^4.0.1"
 pydantic = "^2.12.3"
 python-dotenv = "^1.1.1"
-pytest = "^8.4.2"
 
 [tool.poetry.group.test.dependencies]
-black = "25.1.0"
-mypy = "^1.17.1"
-pylint = "3.3.7"
 pytest="^8.4.1"
+
+[tool.poetry.group.lint.dependencies]
+pylint = "3.3.7"
+
+[tool.poetry.group.format.dependencies]
+black = "25.1.0"
+
+[tool.poetry.group.typecheck.dependencies]
+mypy = "^1.17.1"
 
 
 [build-system]
