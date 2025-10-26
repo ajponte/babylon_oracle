@@ -1,6 +1,6 @@
 import oracle_server.config.hashicorp as MUT
 from pytest import fixture
-from unittest.mock import ANY
+from unittest.mock import ANY, patch
 
 # Mock secrets to be used in tests
 MOCK_SECRETS = {
@@ -66,3 +66,59 @@ def test_open_bao_api_client_add_secret(hvac_client):
 
     # Assert the response matches the mocked response
     assert response == mock_add_response
+
+
+@fixture
+def bao_secrets_manager():
+    """Fixture to provide a BaoSecretsManager instance for testing."""
+    # By patching the OpenBaoApiClient, we can control its behavior in tests
+    with patch('oracle_server.config.hashicorp.OpenBaoApiClient') as mock_api_client:
+        # We need to clear the singleton instance to ensure a fresh start for each test
+        MUT.BaoSecretsManager._instance = None
+        MUT.BaoSecretsManager._initialized = False
+        manager = MUT.BaoSecretsManager()
+        # We replace the manager's client with our mock
+        manager._client = mock_api_client
+        yield manager
+
+
+def test_bao_secrets_manager_add_secret(bao_secrets_manager):
+    """
+    Tests the add_secret method of the BaoSecretsManager.
+    """
+    path = 'test_path'
+    secret = {'key': 'value'}
+    bao_secrets_manager._client.add_secret_value.return_value = {'data': 'some_response'}
+
+    # Call the method under test
+    result = bao_secrets_manager.add_secret(path=path, secret=secret)
+
+    # Assert the underlying client method was called correctly
+    bao_secrets_manager._client.add_secret_value.assert_called_with(path=path, secret=secret)
+    assert result is True
+
+
+def test_bao_secrets_manager_get_secret_from_api_and_cache(bao_secrets_manager):
+    """
+    Tests the get_secret method of the BaoSecretsManager, including caching.
+    """
+    path = 'test_path'
+    key = 'k1'
+    bao_secrets_manager._client.read_secret_values.return_value = MOCK_SECRETS
+
+    # First call, should fetch from API
+    secret = bao_secrets_manager.get_secret(path=path, key=key)
+
+    # Assert the underlying client method was called
+    bao_secrets_manager._client.read_secret_values.assert_called_with(path=path)
+    assert secret == {'key': key, 'val': MOCK_SECRETS[key]}
+
+    # Reset the mock to test caching
+    bao_secrets_manager._client.read_secret_values.reset_mock()
+
+    # Second call, should use cache
+    secret_from_cache = bao_secrets_manager.get_secret(path=path, key=key)
+
+    # Assert the underlying client method was NOT called again
+    bao_secrets_manager._client.read_secret_values.assert_not_called()
+    assert secret_from_cache == {'key': key, 'val': MOCK_SECRETS[key]}
