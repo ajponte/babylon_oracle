@@ -31,3 +31,9 @@ pytest="^8.4.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning",
+    "ignore:jsonschema.exceptions.RefResolutionError is deprecated:DeprecationWarning",
+]

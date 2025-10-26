@@ -1,10 +1,7 @@
+import os
 import pytest
 from pytest import fixture
-import os
 from unittest.mock import patch
-
-from oracle_server.config.hashicorp import OpenBaoApiClient
-from oracle_server.app import create_app
 
 # The following environment variables are set here so they are
 # available for all fixtures, including session-scoped ones.
@@ -19,6 +16,9 @@ MOCK_ENV_VARS = {
 
 # Use os.environ.update() to set the environment variables globally for the test session.
 os.environ.update(MOCK_ENV_VARS)
+
+from oracle_server.config.hashicorp import OpenBaoApiClient
+from oracle_server.app import create_app
 
 MOCK_SECRETS = {
     'DB_HOST': 'https://mock-host.com',
@@ -43,7 +43,7 @@ def hvac_client():
     Changed the scope to 'session' to match mock_bao_client.
     The patch is automatically started and stopped by pytest.
     """
-    with patch('server.config.hashicorp.hvac.Client') as mock_client:
+    with patch('oracle_server.config.hashicorp.hvac.Client') as mock_client:
         yield mock_client
 
 @fixture(scope='session')
