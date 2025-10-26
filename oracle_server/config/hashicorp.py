@@ -123,18 +123,51 @@ class AbstractSecretsManager(ABC):
 
 
 class BaoSecretsManager(AbstractSecretsManager):
+
+
     """OpenBao implementation of `AbstractSecretsManager`."""
 
+
     _instance = None
-    _client = None
-    _cache = None
+
+
+    _initialized = False
+
+
+
+
 
     def __new__(cls):
+
+
         if cls._instance is None:
+
+
             cls._instance = super(BaoSecretsManager, cls).__new__(cls)
-            cls._instance._client = OpenBaoApiClient()
-            cls._instance._cache = {}
+
+
         return cls._instance
+
+
+
+
+
+    def __init__(self):
+
+
+        if self._initialized:
+
+
+            return
+
+
+        self._client = OpenBaoApiClient()
+
+
+        self._cache: dict[str, dict] = {}
+
+
+        self._initialized = True
 
     def add_secret(self, path: str, secret: dict) -> bool:
         response: dict = self._client.add_secret_value(path=path, secret=secret)
