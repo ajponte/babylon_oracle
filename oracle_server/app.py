@@ -1,9 +1,10 @@
 """Main Flask application."""
 
+import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from oracle_server.mcp_handler import handle_mcp_request
-import logging
+
 
 app = Flask(__name__)
 CORS(app)
