@@ -20,7 +20,7 @@ from oracle_server.config.config import (
 from oracle_server.health import setup_health_route
 from oracle_server.logger import logs
 
-DEFAULT_SWAGGER_API_SOURCE = "babylon-api-spec.yml"
+DEFAULT_SWAGGER_API_SOURCE = "_api.yml"
 
 def create_app() -> FlaskApp:
     """

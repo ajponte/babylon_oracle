@@ -47,6 +47,10 @@ class OpenBaoApiClient:
     def __init__(self):
         """Constructor."""
         # todo: Add RSA cert
+        bao_addr = os.environ.get("BAO_ADDR", None)
+        token = os.environ.get("VAULT_TOKEN", None)
+        print(f"BAO_ADDR: {bao_addr}")
+        print(f"VAULT_TOKEN: {token}")
         self._client = hvac.Client(
             # `BAO_ADDR`, `VAULT_TOKEN` are the suggested env var names from Hashicorp.
             url=os.environ.get("BAO_ADDR", None),
@@ -107,10 +111,7 @@ class OpenBaoApiClient:
 
 
 class AbstractSecretsManager(ABC):
-    """Abstract implementation for a secrets manager.
-    Based on skeletons from
-    https://refactoring.guru/design-patterns/singleton/python/example#example-0
-    """
+    """Abstract implementation for a secrets manager."""
 
     @abstractmethod
     def add_secret(self, path: str, secret: dict) -> bool:
@@ -118,7 +119,7 @@ class AbstractSecretsManager(ABC):
         Add PATH/KEY to the internal secrets store.
 
         :param path: The path in the secrets store.
-        :param self: The secret kv, encoded in a `Secret` data type.
+        :param secret: The secret kv.
         """
 
     @abstractmethod
@@ -128,80 +129,36 @@ class AbstractSecretsManager(ABC):
 
 class BaoSecretsManager(AbstractSecretsManager):
     """OpenBao implementation of `AbstractSecretsManager`."""
+    _instance = None
 
-    _instance: OpenBaoApiClient | None = None
-    _secrets: dict[str, Any] | None = None
-
-    # pylint: disable=unused-argument
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if cls._instance is None:
-            # Cache this instance.
-            cls._instance = super(BaoSecretsManager, cls).__new__(cls)  # type: ignore
-            # Cache an openbao API client.
-            cls._instance.client = OpenBaoApiClient()
-        else:
-            _LOGGER.info("Instance already exists. Returning cached.")
+            cls._instance = super(BaoSecretsManager, cls).__new__(cls)
+            cls._instance._client = OpenBaoApiClient()
+            cls._instance._cache = {}
         return cls._instance
 
     def add_secret(self, path: str, secret: dict) -> bool:
-        response: dict = self._instance.client.add_secret_value(  # type: ignore
+        response: dict = self._client.add_secret_value(
             path=path, secret=secret
         )
-        # todo: Add more validations.
         if not response:
             _LOGGER.info("No response from client")
             return False
-        if not self._secrets:
-            self._secrets = secret
-            return True
-        self._secrets.update(secret)
+        # Invalidate cache for the path
+        if path in self._cache:
+            del self._cache[path]
         return True
 
     def get_secret(self, path: str, key: str) -> dict:
-        if self._secrets is None:
+        if path not in self._cache:
             _LOGGER.info(f"Secrets under {path} not cached.")
-            resp = self._instance.client.read_secret_values(path=path)  # type: ignore
-            if not resp:
+            secrets = self._client.read_secret_values(path=path)
+            if not secrets:
                 raise SecretsManagerException(f"No secrets returned under path {path}")
-            self._secrets = resp
-        if key not in self._secrets:
+            self._cache[path] = secrets
+
+        secrets = self._cache[path]
+        if key not in secrets:
             raise SecretsManagerException(f"Secret {path}/{key} not found.")
-        # Create a new Secret data type
-        return {"key": key, "val": self._secrets[key]}
-
-
-# def test_bao_api_client():
-#     client = OpenBaoApiClient()
-#
-#     client.add_secret_value(path='test', secret={'foo': 'bar'})
-#
-#     resp = client.read_secret_values(path='test')
-#     print(f'resp: {resp}')
-#
-# def test_secrets_manager():
-#     path = 'test'
-#     secrets_manager = BaoSecretsManager()
-#     secrets_manager.add_secret(
-#         path=path,
-#         secret={'foo': 'bar'}
-#     )
-#
-#     secrets_manager.add_secret(
-#         path=path,
-#         secret={'bazz': 'lazz'}
-#     )
-#
-#     # secrets_manager.add_secret(
-#     #     path=path,
-#     #     secret={'foo': 'bar'}
-#     # )
-#     resp = secrets_manager.get_secret(path=path, key='foo')
-#
-#     assert resp == {'key': 'foo', 'val': 'bar'}
-#
-#     resp = secrets_manager.get_secret(path=path, key='bazz')
-#
-#     assert resp == {'key': 'bazz', 'val': 'lazz'}
-#
-# test_secrets_manager()
-# test_bao_api_client()
+        return {"key": key, "val": secrets[key]}
