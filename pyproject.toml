@@ -26,6 +26,7 @@ black = "25.1.0"
 mypy = "^1.17.1"
 pylint = "3.3.7"
 pytest="^8.4.1"
+pytest-env = "^1.2.0"
 
 
 [build-system]

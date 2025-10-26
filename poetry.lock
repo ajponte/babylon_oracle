@@ -1057,6 +1057,23 @@ pygments = ">=2.7.2"
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-env"
+version = "1.2.0"
+description = "pytest plugin that allows you to add environment variables."
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "pytest_env-1.2.0-py3-none-any.whl", hash = "sha256:d7e5b7198f9b83c795377c09feefa45d56083834e60d04767efd64819fc9da00"},
+    {file = "pytest_env-1.2.0.tar.gz", hash = "sha256:475e2ebe8626cee01f491f304a74b12137742397d6c784ea4bc258f069232b80"},
+]
+
+[package.dependencies]
+pytest = ">=8.4.2"
+
+[package.extras]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.10.7)", "pytest-mock (>=3.15.1)"]
+
+[[package]]
 name = "python-dotenv"
 version = "1.1.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -1725,4 +1742,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "52071148886fb258ffe84983f17fc9e148c3c6adffde808bdf017e389f38c4b6"
+content-hash = "8eb029e4c6dd009a9b04f06c98673b1cae07ebfbf60b1e4d3e0ec9493d4bb1a3"
