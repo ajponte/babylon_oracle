@@ -1,10 +1,7 @@
-from typing import Callable
-
+"""
+Custom /health route.
+"""
 from flask import Flask
-
-
-"""Health route."""
-
 
 def health():
     """

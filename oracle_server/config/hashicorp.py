@@ -1,7 +1,6 @@
 # Note: This script is very much for dev/test purposes only.
 """Utils for interacting with Hashicorp/Openbao."""
 from abc import ABC, abstractmethod
-from typing import Any
 import os
 import logging
 import hvac
@@ -126,6 +125,8 @@ class AbstractSecretsManager(ABC):
 class BaoSecretsManager(AbstractSecretsManager):
     """OpenBao implementation of `AbstractSecretsManager`."""
     _instance = None
+    _client = None
+    _cache = None
 
     def __new__(cls):
         if cls._instance is None:

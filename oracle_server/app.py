@@ -10,7 +10,7 @@ from typing import Any
 from connexion import FlaskApp  # type: ignore
 from werkzeug.exceptions import NotFound
 
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from flask_cors import CORS
 
 from oracle_server.config.config import (
