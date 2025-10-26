@@ -43,6 +43,7 @@ CONFIG_LOADERS: list[Loader] = [
     optional(key="MCP_SERVER_HOST", default_val="localhost"),
     optional(key="MCP_SERVER_PORT", default_val="8080"),
     optional(key="MCP_SERVER_URL", default_val="http://localhost:8080"),
+    optional(key="CORS_ORIGINS", default_val="http://localhost:3000"),
 ]
 
 SECRETS_LOADERS: list[Loader] = [

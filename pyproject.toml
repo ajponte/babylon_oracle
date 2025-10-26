@@ -19,6 +19,7 @@ hvac = "2.3.0"
 Flask-Cors = "^4.0.1"
 pydantic = "^2.12.3"
 python-dotenv = "^1.1.1"
+starlette = "^0.48.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest="^8.4.1"

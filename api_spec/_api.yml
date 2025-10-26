@@ -36,7 +36,7 @@ paths:
   # For now, we chat with Babylon via this POST route.
   # For a more robust solution, well need to support
   # a websocket, streaming, polling, etc.
-  /sendMessage:
+  /message:
     post:
       tags:
         - chat
@@ -49,7 +49,7 @@ paths:
             type: string
           required: false
       requestBody:
-        description: chat_input
+        description: chat input
         required: false
         content:
           application/json:
@@ -57,8 +57,8 @@ paths:
               type: object
               properties:
                 # For now, just allow for some other dictionary to be passed.
-                options:
-                  type: object
+                user_input:
+                  type: string
                   description: Optional properties to pass to chat.
 
       responses:

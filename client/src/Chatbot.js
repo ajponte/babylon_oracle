@@ -16,7 +16,7 @@ const Chatbot = () => {
     setInput('');
 
     try {
-      const response = await axios.post('http://localhost:5001/chat', { user_input: input });
+      const response = await axios.post('http://localhost:5003/api/message', { user_input: input });
       setMessages([...newMessages, { text: response.data.response, sender: 'bot' }]);
     } catch (error) {
       console.error('Error sending message:', error);
