@@ -8,7 +8,7 @@ const App = () => {
       <CssBaseline />
       <Container maxWidth="sm">
         <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Chatbot
+          Babylon
         </Typography>
         <Chatbot />
       </Container>
