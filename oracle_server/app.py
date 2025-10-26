@@ -11,11 +11,13 @@ CORS(app)
 # Set up basic logging
 logging.basicConfig(level=logging.DEBUG)
 
+
 @app.before_request
 def log_request_info():
     """Logs information about the incoming request."""
-    app.logger.debug('Headers: %s', request.headers)
-    app.logger.debug('Body: %s', request.get_data())
+    app.logger.debug("Headers: %s", request.headers)
+    app.logger.debug("Body: %s", request.get_data())
+
 
 @app.route("/chat", methods=["POST", "OPTIONS"])
 def chat():
@@ -23,7 +25,7 @@ def chat():
     if request.method == "OPTIONS":
         # Pre-flight request. Reply successfully:
         return "", 200
-    
+
     app.logger.info("Received request for /chat")
     data = request.get_json()
     app.logger.debug("Request data: %s", data)
