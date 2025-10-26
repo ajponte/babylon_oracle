@@ -215,3 +215,7 @@ client/node_modules/
 # Bundled artifact
 client/public/bundle.js
 
+# Local Secrets Manger
+bao-data/
+root.token
+unseal.key

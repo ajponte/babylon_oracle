@@ -34,6 +34,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ matrix.python }}-tox-
 
+    - name: Install lint/format/test tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint black pytest
+
     - name: Install pip dependencies
       run: |
         python -m pip install --upgrade pip
@@ -42,7 +47,7 @@ jobs:
 
     - name: Install poetry dependencies
       run: |
-        poetry install
+        poetry install --with dev
      
 
     - name: Run checks with tox
@@ -50,4 +55,4 @@ jobs:
         # Use '--skip-pkg-install' to prevent package re-installation 
         # IF the environment already exists and is up-to-date.
         # Note: If dependencies change, tox will re-install them and the cache key will change.
-        tox -e lint,format,pytest --skip-pkg-install
+        tox -e lint,format,pytest

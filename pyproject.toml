@@ -10,21 +10,29 @@ readme = "README.md"
 python = "^3.13"
 
 # Web server
-Flask = "^3.1.2"
+connexion = { version = "^3.2.0", extras = ["flask", "swagger-ui", "uvicorn"] }
+#Flask = "^3.1.2"
 requests = "^2.32.5"
 
 # Secrets manager
 hvac = "2.3.0"
 Flask-Cors = "^4.0.1"
 pydantic = "^2.12.3"
+python-dotenv = "^1.1.1"
 
-[tool.poetry.group.test.dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest="^8.4.1"
+pylint = "3.3.7"
 black = "25.1.0"
 mypy = "^1.17.1"
-pylint = "3.3.7"
-pytest="^8.4.1"
 
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "tox-poetry", "poetry"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning",
+    "ignore:jsonschema.exceptions.RefResolutionError is deprecated:DeprecationWarning",
+]

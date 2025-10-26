@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  license:
+    name: Unlicense
+    url: https://unlicense.org/
+  title: Babylon API
+  version: 1.0.0
+  description: Babylon API Specification.
+servers:
+  - url: /api
+# Uncomment to enable auth
+#security:
+#  - bearerAuth: []
+
+paths:
+  /echo:
+    get:
+      tags:
+        - echo
+      operationId: oracle_server.controllers.echo.do_echo
+      summary: Echo
+      parameters:
+        - name: inputVal
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          $ref: '#/components/responses/HttpEchoResponse'
+        '400':
+          $ref: '#/components/responses/HttpBadRequestResponse'
+        '500':
+          $ref: '#/components/responses/HttpInternalServerErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: server.app.decode_token
+  schemas:
+    EchoResponse:
+      type: object
+      properties:
+        echoed_value:
+          type: string
+          description: The value that was echoed back.
+
+    DebugMessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A message attached to an HTTP response for debugging purposes.
+
+    TransactionId:
+      type: string
+      description: Transaction unique ID.
+      example: f7bf189b-e7c2-4f85-bf73-0c45e7825a74
+
+    UtcTimestamp:
+      type: integer
+      format: int64
+      description: A UNIX UTC timestamp in seconds.
+      example: 1756773077
+
+  responses:
+    HttpEchoResponse:
+      description: echoed response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EchoResponse'
+    HttpBadRequestResponse:
+      description: 400 - Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
+    HttpInternalServerErrorResponse:
+      description: 500 - Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
+
+    HttpUnauthorizedResponse:
+      description: 401 - Not Authorized to perform this action
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
+
+    HttpForbiddenResponse:
+      description: 403 - Required permssions not present.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
+
+    HttpNotFoundResponse:
+      description: 404 - Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
+
+    HttpConflictResponse:
+      description: 409- Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DebugMessageResponse'
