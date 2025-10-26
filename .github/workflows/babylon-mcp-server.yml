@@ -47,7 +47,7 @@ jobs:
 
     - name: Install poetry dependencies
       run: |
-        poetry install --with test
+        poetry install --with dev
      
 
     - name: Run checks with tox
