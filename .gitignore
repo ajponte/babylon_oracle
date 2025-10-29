@@ -219,3 +219,6 @@ client/public/bundle.js
 bao-data/
 root.token
 unseal.key
+
+# Chroma Vector DB
+chromadb/
