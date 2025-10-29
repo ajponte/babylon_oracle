@@ -20,13 +20,14 @@ async def send_message(handler: str | None = None) -> tuple[dict[str, Any], int]
     cfg = current_app.config
     handler = BabylonChatHandler(
         llm_model=DEFAULT_GPT_MODEL,
-        embedding_model=cfg['EMBEDDING_MODEL']
+        embedding_model=cfg['EMBEDDING_MODEL'],
+        model_url=DEFAULT_GPT_MODEL_URL
     )
     response = ''
     try:
         chat_response = handler.handle_input_message(message=request_body['user_input'])
         for event in chat_response:
-            response += event["messages"][-1]
+            response += event["messages"][-1].content
     except Exception as e:
         message = f'Error while handling input message. {e}'
         _LOGGER.debug(message)

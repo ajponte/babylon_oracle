@@ -57,15 +57,15 @@ class ChatHandler(ABC):
         self._workflow = StateGraph(state_schema=MessagesState)
         self._thread_id = uuid.uuid4()
         self._config = {"configurable": {"thread_id": self._thread_id}}
+        # Define the two nodes we will cycle between
+        self._workflow.add_node("model", self.call_model)
+        self._workflow.add_edge(START, "model")
         try:
             self._app = self._workflow.compile(checkpointer=self._memory)
         except Exception as e:
             message = f'Error compiling workflow for thread {self._thread_id}'
             _LOGGER.info(message)
             raise ChatError(message=message, cause=e) from e
-        # Define the two nodes we will cycle between
-        self._workflow.add_edge(START, "model")
-        self._workflow.add_node("model", self.call_model)
 
     @abstractmethod
     def handle_input_message(self, message: str):
@@ -148,8 +148,8 @@ class BabylonChatHandler(ChatHandler):
     """
     ChatHandler implementation for Babylon.
     """
-    def __init__(self, embedding_model: str, llm_model: str):
-        super().__init__(embedding_model=embedding_model, llm_model=llm_model)
+    def __init__(self, embedding_model: str, llm_model: str, model_url: str | None = None):
+        super().__init__(embedding_model=embedding_model, llm_model=llm_model, model_url=model_url)
 
     def handle_input_message(self, message: str) -> Iterator:
         # result = self._conversation_chain.invoke({'question': message})
