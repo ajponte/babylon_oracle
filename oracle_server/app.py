@@ -8,6 +8,8 @@ import datetime as dt
 from pathlib import Path
 from typing import Any
 from connexion import FlaskApp  # type: ignore
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
 from werkzeug.exceptions import NotFound
 
 from flask import request, jsonify
@@ -32,6 +34,14 @@ def create_app() -> FlaskApp:
     spec_path = get_api_spec_path(DEFAULT_SWAGGER_API_SOURCE)
     print(f"full spec path: {spec_path}")
     app = FlaskApp(__name__)
+    app.add_middleware(
+        CORSMiddleware,
+        position=MiddlewarePosition.BEFORE_ROUTING,
+        allow_origins=["*"],  # Allows all origins, replace with specific origins for production
+        allow_credentials=True,
+        allow_methods=["*"],  # Allows all methods
+        allow_headers=["*"],  # Allows all headers
+    )
     print("Successfully create flask app from connexion factory.")
     try:
         app.add_api(
@@ -49,7 +59,11 @@ def create_app() -> FlaskApp:
     flask_app = app.app
     _setup_logging(app)
     _setup_config(app)
-    CORS(flask_app)
+
+    cors_origins = flask_app.config.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+    flask_app.logger.debug(f"CORS_ORIGINS: {cors_origins}")
+    # CORS(app.app, resources={r"/api/*": {"origins": cors_origins}})
+
     setup_health_route(flask_app)
     _setup_http_error_handling(app)
 
