@@ -18,10 +18,12 @@ async def send_message(handler: str | None = None) -> tuple[dict[str, Any], int]
     print(f'Registered handler: {handler}')
     request_body = await connexion.request.json()
     cfg = current_app.config
+    thread_id = request_body.get('thread_id')
     handler = BabylonChatHandler(
         llm_model=DEFAULT_GPT_MODEL,
         embedding_model=cfg['EMBEDDING_MODEL'],
-        model_url=DEFAULT_GPT_MODEL_URL
+        model_url=DEFAULT_GPT_MODEL_URL,
+        thread_id=thread_id
     )
     response = ''
     try:
@@ -33,4 +35,4 @@ async def send_message(handler: str | None = None) -> tuple[dict[str, Any], int]
         _LOGGER.debug(message)
         return {'message': message}, HTTPStatus.INTERNAL_SERVER_ERROR
 
-    return {'text': response}, HTTPStatus.OK
+    return {'text': response, 'thread_id': handler.thread_id}, HTTPStatus.OK

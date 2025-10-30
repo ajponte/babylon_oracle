@@ -8,12 +8,8 @@ from typing import Any
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import HumanMessage
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
-
-from oracle_server.error import ChatError
 from oracle_server.vectorstore import ChromaVectorStore
-
 
 _LOGGER = logging.getLogger()
 
@@ -31,7 +27,8 @@ class ChatHandler(ABC):
         self,
         embedding_model: str,
         llm_model: str,
-        model_url: str | None = None
+        model_url: str | None = None,
+        thread_id: str | None = None,
     ):
         """
         Constructor.
@@ -52,10 +49,10 @@ class ChatHandler(ABC):
             collection=DEFAULT_VECTOR_COLLECTION
         )
         self._chatbot = self.retrieve_chatbot()
-        self._memory = MemorySaver()
+        self._memory = []
         self._vector_retriever = self._retrieve_vectors()
         self._workflow = StateGraph(state_schema=MessagesState)
-        self._thread_id = uuid.uuid4()
+        self._thread_id = thread_id or str(uuid.uuid4())
         self._config = {"configurable": {"thread_id": self._thread_id}}
         # Define the two nodes we will cycle between
         self._workflow.add_node("model", self.call_model)
@@ -75,6 +72,15 @@ class ChatHandler(ABC):
         :param message: The user's message.
         """
         ...
+
+    @property
+    def thread_id(self) -> str:
+        """
+        Return the thread id.
+
+        :return: The thread id.
+        """
+        return self._thread_id
 
     @property
     def embedding_model(self) -> str:
@@ -148,8 +154,8 @@ class BabylonChatHandler(ChatHandler):
     """
     ChatHandler implementation for Babylon.
     """
-    def __init__(self, embedding_model: str, llm_model: str, model_url: str | None = None):
-        super().__init__(embedding_model=embedding_model, llm_model=llm_model, model_url=model_url)
+    def __init__(self, embedding_model: str, llm_model: str, model_url: str | None = None, thread_id: str | None = None):
+        super().__init__(embedding_model=embedding_model, llm_model=llm_model, model_url=model_url, thread_id=thread_id)
 
     def handle_input_message(self, message: str) -> Iterator:
         # result = self._conversation_chain.invoke({'question': message})
