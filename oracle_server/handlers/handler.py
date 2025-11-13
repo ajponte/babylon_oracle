@@ -3,11 +3,10 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from typing import Any
 
-from langchain_core.vectorstores import VectorStoreRetriever
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import HumanMessage
+from langchain_core.vectorstores import VectorStoreRetriever
+from langchain_openai import ChatOpenAI
 from langgraph.graph import START, MessagesState, StateGraph
 
 from oracle_server.error import ChatError
@@ -24,7 +23,9 @@ DEFAULT_CHAT_MEMORY_KEY = 'chat_history'
 DEFAULT_OPEN_API_KEY = 'ollama'
 
 
+# pylint: disable=too-many-instance-attributes
 class ChatHandler(ABC):
+    """Base Chat Handler which all implementations should inherit from."""
     def __init__(
         self,
         embedding_model: str,
@@ -73,7 +74,6 @@ class ChatHandler(ABC):
 
         :param message: The user's message.
         """
-        ...
 
     @property
     def thread_id(self) -> str:
@@ -148,6 +148,12 @@ class ChatHandler(ABC):
 
     # Define the function that calls the chatbot LLM model.
     def call_model(self, state: MessagesState):
+        """
+        Invoke the chatbot model.
+
+        :param state: Current message history.
+        :return: Chat response.
+        """
         response = self.chatbot.invoke(state["messages"])
         # We return a list, because this will get added to the existing list
         return {"messages": response}
@@ -156,11 +162,38 @@ class BabylonChatHandler(ChatHandler):
     """
     ChatHandler implementation for Babylon.
     """
-    def __init__(self, embedding_model: str, llm_model: str, model_url: str | None = None, thread_id: str | None = None):
-        super().__init__(embedding_model=embedding_model, llm_model=llm_model, model_url=model_url, thread_id=thread_id)
+    def __init__(
+        self,
+        embedding_model: str,
+        llm_model: str,
+        model_url: str | None = None,
+        thread_id: str | None = None
+    ):
+        """
+        Constructor.
+
+        :param embedding_model: Target embeddings model.
+        :param llm_model: Target chatbot model.
+        :param model_url: Model url.
+        :param thread_id: Any predifined thread a current process is running on.
+        """
+        super().__init__(
+            embedding_model=embedding_model,
+            llm_model=llm_model,
+            model_url=model_url,
+            thread_id=thread_id
+        )
 
     def handle_input_message(self, message: str) -> Iterator:
-        # result = self._conversation_chain.invoke({'question': message})
-        # return result['answer']
+        """
+        Handle a user's input message.
+
+        :param message: The user message.
+        :return: Iterator over message responses.
+        """
         input_message = HumanMessage(content=message)
-        return self._app.stream({'messages': [input_message]}, self._config, stream_mode='values')
+        return self._app.stream(
+            {'messages': [input_message]},
+            self._config,
+            stream_mode='values'
+        )

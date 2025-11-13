@@ -15,6 +15,12 @@ DEFAULT_GPT_MODEL_URL = 'http://localhost:11434/v1'
 
 
 async def send_message(handler: str | None = None) -> tuple[dict[str, Any], int]:
+    """
+    Controller method for handling chat input.
+
+    :param handler: Desired chat handler, identified by name.
+    :return: Response from invoking chat handler.
+    """
     print(f'Registered handler: {handler}')
     request_body = await connexion.request.json()
     cfg = current_app.config

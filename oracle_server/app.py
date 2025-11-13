@@ -13,7 +13,6 @@ from starlette.middleware.cors import CORSMiddleware
 from werkzeug.exceptions import NotFound
 
 from flask import request, jsonify
-from flask_cors import CORS
 
 from oracle_server.config.config import (
     update_config_from_environment,
