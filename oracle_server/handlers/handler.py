@@ -9,6 +9,8 @@ from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langgraph.graph import START, MessagesState, StateGraph
+
+from oracle_server.error import ChatError
 from oracle_server.vectorstore import ChromaVectorStore
 
 _LOGGER = logging.getLogger()
