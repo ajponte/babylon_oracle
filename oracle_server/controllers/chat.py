@@ -35,10 +35,20 @@ async def send_message(handler: str | None = None) -> tuple[dict[str, Any], int]
     try:
         chat_response = handler.handle_input_message(message=request_body['user_input'])
         for event in chat_response:
-            response += event["messages"][-1].content
+            response += _handle_chat_response(event=event, response_str=response)
     except Exception as e:
         message = f'Error while handling input message. {e}'
         _LOGGER.debug(message)
         return {'message': message}, HTTPStatus.INTERNAL_SERVER_ERROR
 
     return {'text': response, 'thread_id': handler.thread_id}, HTTPStatus.OK
+
+def _handle_chat_response(event, response_str: str = '') -> str:
+    """Handle chat response object."""
+    try:
+        _LOGGER.debug(f'Handling chat response event: {event}')
+        response_str += event["messages"][-1].content
+    except Exception as e:
+        # Don't raise an error here yet. Move on for further processing.
+        _LOGGER.info(f'Error handling chat response: {e}')
+    return response_str

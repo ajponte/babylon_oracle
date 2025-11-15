@@ -3,11 +3,16 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from operator import itemgetter
+
+from langchain_core.runnables import RunnablePassthrough
 
 from langchain_core.messages import HumanMessage
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_openai import ChatOpenAI
 from langgraph.graph import START, MessagesState, StateGraph
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.types import Checkpointer
 
 from oracle_server.error import ChatError
 from oracle_server.vectorstore import ChromaVectorStore
@@ -52,16 +57,13 @@ class ChatHandler(ABC):
             collection=DEFAULT_VECTOR_COLLECTION
         )
         self._chatbot = self.retrieve_chatbot()
-        self._memory = []
         self._vector_retriever = self._retrieve_vectors()
-        self._workflow = StateGraph(state_schema=MessagesState)
         self._thread_id = thread_id or str(uuid.uuid4())
         self._config = {"configurable": {"thread_id": self._thread_id}}
-        # Define the two nodes we will cycle between
-        self._workflow.add_node("model", self.call_model)
-        self._workflow.add_edge(START, "model")
         try:
-            self._app = self._workflow.compile(checkpointer=self._memory)
+            _LOGGER.info('Compiling LangGraph workflow')
+            self._workflow = self._create_workflow()
+            self._app = self._workflow.compile(checkpointer=MemorySaver())
         except Exception as e:
             message = f'Error compiling workflow for thread {self._thread_id}'
             _LOGGER.info(message)
@@ -146,17 +148,44 @@ class ChatHandler(ABC):
         _LOGGER.debug('Retrieving vector store retriever')
         return self._vector_store.db_client.as_retriever(search_kwargs={'k': top_k})
 
+    def _create_workflow(self) -> StateGraph:
+        """
+        Create the workflow for the chatbot.
+
+        :return: A `StateGraph` instance.
+        """
+        _LOGGER.info('Building State Graph')
+        workflow = StateGraph(state_schema=MessagesState)
+        workflow.add_node("model", self.rag_model)
+        workflow.add_edge(START, "model")
+        return workflow
+
     # Define the function that calls the chatbot LLM model.
-    def call_model(self, state: MessagesState):
+    def _invoke_chatbot(self, state: MessagesState):
         """
         Invoke the chatbot model.
 
         :param state: Current message history.
         :return: Chat response.
         """
-        response = self.chatbot.invoke(state["messages"])
-        # We return a list, because this will get added to the existing list
-        return {"messages": response}
+        return self.chatbot.invoke(state["messages"])
+
+    def rag_model(self, state: MessagesState) -> dict:
+        """
+        Invoke the RAG model.
+
+        :param state: Current message history.
+        :return: Chat response.
+        """
+        rag_chain = (
+            RunnablePassthrough.assign(
+                context=itemgetter("messages")
+                | self._vector_retriever
+            )
+            | self._invoke_chatbot
+        )
+        response = rag_chain.invoke(state)
+        return {"messages": [response]}
 
 class BabylonChatHandler(ChatHandler):
     """
@@ -192,6 +221,7 @@ class BabylonChatHandler(ChatHandler):
         :return: Iterator over message responses.
         """
         input_message = HumanMessage(content=message)
+        _LOGGER.debug(f'Generating streamed response for message: {message}')
         return self._app.stream(
             {'messages': [input_message]},
             self._config,
