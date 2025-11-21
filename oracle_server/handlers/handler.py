@@ -28,6 +28,7 @@ DEFAULT_CHAT_MEMORY_KEY = 'chat_history'
 DEFAULT_OPEN_API_KEY = 'ollama'
 
 
+# todo: add factory
 # pylint: disable=too-many-instance-attributes
 class ChatHandler(ABC):
     """Base Chat Handler which all implementations should inherit from."""
@@ -177,14 +178,7 @@ class ChatHandler(ABC):
         :param state: Current message history.
         :return: Chat response.
         """
-        rag_chain = (
-            RunnablePassthrough.assign(
-                context=itemgetter("messages")
-                | self._vector_retriever
-            )
-            | self._invoke_chatbot
-        )
-        response = rag_chain.invoke(state)
+        response = self.chatbot.invoke(state["messages"])
         return {"messages": [response]}
 
 class BabylonChatHandler(ChatHandler):
