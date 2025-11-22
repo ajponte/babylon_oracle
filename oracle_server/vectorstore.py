@@ -1,4 +1,3 @@
-
 """
 Vector Store.
 
@@ -6,6 +5,7 @@ A vector store is a specialized database which stores vectors
 of high dimensionality.
 
 """
+
 import logging
 
 from abc import ABC, abstractmethod

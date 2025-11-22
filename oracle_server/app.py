@@ -36,7 +36,9 @@ def create_app() -> FlaskApp:
     app.add_middleware(
         CORSMiddleware,
         position=MiddlewarePosition.BEFORE_ROUTING,
-        allow_origins=["*"],  # Allows all origins, replace with specific origins for production
+        allow_origins=[
+            "*"
+        ],  # Allows all origins, replace with specific origins for production
         allow_credentials=True,
         allow_methods=["*"],  # Allows all methods
         allow_headers=["*"],  # Allows all headers
@@ -59,7 +61,9 @@ def create_app() -> FlaskApp:
     _setup_logging(app)
     _setup_config(app)
 
-    cors_origins = flask_app.config.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+    cors_origins = flask_app.config.get("CORS_ORIGINS", "http://localhost:3000").split(
+        ","
+    )
     flask_app.logger.debug(f"CORS_ORIGINS: {cors_origins}")
     # CORS(app.app, resources={r"/api/*": {"origins": cors_origins}})
 

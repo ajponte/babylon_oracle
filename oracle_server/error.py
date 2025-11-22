@@ -1,5 +1,6 @@
 """Domain-level errors."""
 
+
 class ChatError(Exception):
     """
     Throw this error when there's an issue handling chat messages.

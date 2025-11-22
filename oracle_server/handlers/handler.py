@@ -1,18 +1,15 @@
 """Basic chat handler."""
+
 import logging
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from operator import itemgetter
-
-from langchain_core.runnables import RunnablePassthrough
 
 from langchain_core.messages import HumanMessage
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_openai import ChatOpenAI
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.types import Checkpointer
 
 from oracle_server.error import ChatError
 from oracle_server.vectorstore import ChromaVectorStore
@@ -22,16 +19,17 @@ _LOGGER = logging.getLogger()
 # todo: move to config
 DEFAULT_MODEL_TEMP = 0.7
 DEFAULT_TOP_K = 5
-DEFAULT_SQLITE_DIR = './chromadb'
-DEFAULT_VECTOR_COLLECTION = 'babylon_vectors'
-DEFAULT_CHAT_MEMORY_KEY = 'chat_history'
-DEFAULT_OPEN_API_KEY = 'ollama'
+DEFAULT_SQLITE_DIR = "./chromadb"
+DEFAULT_VECTOR_COLLECTION = "babylon_vectors"
+DEFAULT_CHAT_MEMORY_KEY = "chat_history"
+DEFAULT_OPEN_API_KEY = "ollama"
 
 
 # todo: add factory
 # pylint: disable=too-many-instance-attributes
 class ChatHandler(ABC):
     """Base Chat Handler which all implementations should inherit from."""
+
     def __init__(
         self,
         embedding_model: str,
@@ -49,24 +47,24 @@ class ChatHandler(ABC):
         self._model_url = model_url
         # Set up hyper params.
         self._hyper_parameters = {
-                'temperature': DEFAULT_MODEL_TEMP,
-                'top_k': DEFAULT_TOP_K
+            "temperature": DEFAULT_MODEL_TEMP,
+            "top_k": DEFAULT_TOP_K,
         }
         self._vector_store = ChromaVectorStore(
             model=self._embedding_model,
             sqlite_dir=DEFAULT_SQLITE_DIR,
-            collection=DEFAULT_VECTOR_COLLECTION
+            collection=DEFAULT_VECTOR_COLLECTION,
         )
         self._chatbot = self.retrieve_chatbot()
         self._vector_retriever = self._retrieve_vectors()
         self._thread_id = thread_id or str(uuid.uuid4())
         self._config = {"configurable": {"thread_id": self._thread_id}}
         try:
-            _LOGGER.info('Compiling LangGraph workflow')
+            _LOGGER.info("Compiling LangGraph workflow")
             self._workflow = self._create_workflow()
             self._app = self._workflow.compile(checkpointer=MemorySaver())
         except Exception as e:
-            message = f'Error compiling workflow for thread {self._thread_id}'
+            message = f"Error compiling workflow for thread {self._thread_id}"
             _LOGGER.info(message)
             raise ChatError(message=message, cause=e) from e
 
@@ -97,7 +95,6 @@ class ChatHandler(ABC):
         """
         return self._embedding_model
 
-
     @property
     def hyper_parameters(self) -> dict:
         """
@@ -117,25 +114,25 @@ class ChatHandler(ABC):
         return self._chatbot
 
     def retrieve_chatbot(
-            self,
+        self,
     ) -> ChatOpenAI:
         """
         Retrieve a chatbot based on model identifier.
 
         :return: A  `ChatOpenAI` instantiation with the model.
         """
-        temperature = self.hyper_parameters.get('temperature', DEFAULT_MODEL_TEMP)
+        temperature = self.hyper_parameters.get("temperature", DEFAULT_MODEL_TEMP)
         # Some models require slightly different configurations.
         if self._model_url:
-            _LOGGER.debug(f'Opening ChatOpenAI interface for model {self._llm_model}')
+            _LOGGER.debug(f"Opening ChatOpenAI interface for model {self._llm_model}")
             llm = ChatOpenAI(
                 temperature=temperature,
                 model=self._llm_model,
                 base_url=self._model_url,
-                api_key=DEFAULT_OPEN_API_KEY
+                api_key=DEFAULT_OPEN_API_KEY,  # type: ignore
             )
         else:
-            _LOGGER.debug(f'Opening ChatOpenAI interface for model {self._llm_model}')
+            _LOGGER.debug(f"Opening ChatOpenAI interface for model {self._llm_model}")
             llm = ChatOpenAI(temperature=temperature, model=self._llm_model)
         return llm
 
@@ -145,9 +142,9 @@ class ChatHandler(ABC):
 
         :return: VectorStoreRetriever.
         """
-        top_k = self.hyper_parameters.get('top_k', DEFAULT_TOP_K)
-        _LOGGER.debug('Retrieving vector store retriever')
-        return self._vector_store.db_client.as_retriever(search_kwargs={'k': top_k})
+        top_k = self.hyper_parameters.get("top_k", DEFAULT_TOP_K)
+        _LOGGER.debug("Retrieving vector store retriever")
+        return self._vector_store.db_client.as_retriever(search_kwargs={"k": top_k})
 
     def _create_workflow(self) -> StateGraph:
         """
@@ -155,7 +152,7 @@ class ChatHandler(ABC):
 
         :return: A `StateGraph` instance.
         """
-        _LOGGER.info('Building State Graph')
+        _LOGGER.info("Building State Graph")
         workflow = StateGraph(state_schema=MessagesState)
         workflow.add_node("model", self.rag_model)
         workflow.add_edge(START, "model")
@@ -181,16 +178,18 @@ class ChatHandler(ABC):
         response = self.chatbot.invoke(state["messages"])
         return {"messages": [response]}
 
+
 class BabylonChatHandler(ChatHandler):
     """
     ChatHandler implementation for Babylon.
     """
+
     def __init__(
         self,
         embedding_model: str,
         llm_model: str,
         model_url: str | None = None,
-        thread_id: str | None = None
+        thread_id: str | None = None,
     ):
         """
         Constructor.
@@ -204,7 +203,7 @@ class BabylonChatHandler(ChatHandler):
             embedding_model=embedding_model,
             llm_model=llm_model,
             model_url=model_url,
-            thread_id=thread_id
+            thread_id=thread_id,
         )
 
     def handle_input_message(self, message: str) -> Iterator:
@@ -215,9 +214,9 @@ class BabylonChatHandler(ChatHandler):
         :return: Iterator over message responses.
         """
         input_message = HumanMessage(content=message)
-        _LOGGER.debug(f'Generating streamed response for message: {message}')
+        _LOGGER.debug(f"Generating streamed response for message: {message}")
         return self._app.stream(
-            {'messages': [input_message]},
-            self._config,
-            stream_mode='values'
+            {"messages": [input_message]},  # type: ignore
+            self._config,  # type: ignore
+            stream_mode="values",
         )

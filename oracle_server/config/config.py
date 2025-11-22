@@ -42,7 +42,6 @@ CONFIG_LOADERS: list[Loader] = [
     optional(key="DATALAKE_COLLECTION_PREFIX", default_val="chase-data-"),
     optional(key="MCP_SERVER_HOST", default_val="localhost"),
     optional(key="MCP_SERVER_PORT", default_val="8080"),
-
     # todo: move to `required` (currently used for easier testing).
     optional(key="MCP_SERVER_URL", default_val="http://localhost:8080"),
     optional(key="CORS_ORIGINS", default_val="http://localhost:3000"),
