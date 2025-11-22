@@ -33,6 +33,48 @@ paths:
         '500':
           $ref: '#/components/responses/HttpInternalServerErrorResponse'
 
+  # For now, we chat with Babylon via this POST route.
+  # For a more robust solution, well need to support
+  # a websocket, streaming, polling, etc.
+  /message:
+    post:
+      tags:
+        - chat
+      operationId: oracle_server.controllers.chat.send_message
+      summary: Invoke the MCP server's handler.
+      parameters:
+        - name: handler
+          in: query
+          schema:
+            type: string
+          required: false
+      requestBody:
+        description: chat input
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                # For now, just allow for some other dictionary to be passed.
+                user_input:
+                  type: string
+                  description: Optional properties to pass to chat.
+
+      responses:
+        '200':
+          $ref: '#/components/responses/HttpChatResponse'
+        '400':
+          $ref: '#/components/responses/HttpBadRequestResponse'
+        '401':
+          $ref: '#/components/responses/HttpUnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/HttpForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/HttpNotFoundResponse'
+        '500':
+          $ref: '#/components/responses/HttpInternalServerErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -47,6 +89,14 @@ components:
         echoed_value:
           type: string
           description: The value that was echoed back.
+
+    ChatResponse:
+      description: Response from invoking a chat handler.
+      type: object
+      properties:
+        text:
+          type: string
+          description: Text response from chat handler.
 
     DebugMessageResponse:
       type: object
@@ -73,12 +123,21 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/EchoResponse'
+
+    HttpChatResponse:
+        description: Response from invoking a chat handler.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatResponse'
+
     HttpBadRequestResponse:
       description: 400 - Bad Request
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/DebugMessageResponse'
+
     HttpInternalServerErrorResponse:
       description: 500 - Internal Server Error
       content:

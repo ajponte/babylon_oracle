@@ -9,8 +9,8 @@ const app = express();
 
 // todo: move to config
 const MCP_SERVER_HOST = "localhost"
-const MCP_SERVER_PORT = 5001
-const MCP_CHAT_URI = '/chat'
+const MCP_SERVER_PORT = 5003
+const MCP_CHAT_URI = '/api/message'
 
 
 const DEFAULT_MCP_HOST = "localhost"

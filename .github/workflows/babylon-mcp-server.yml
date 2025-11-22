@@ -34,25 +34,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ matrix.python }}-tox-
 
-    - name: Install lint/format/test tools
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint black pytest
-
-    - name: Install pip dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
-        pip install poetry
-
-    - name: Install poetry dependencies
-      run: |
+        pip install tox poetry
         poetry install --with dev
      
 
-    - name: Run checks with tox
+    - name: Run checks
       run: |
-        # Use '--skip-pkg-install' to prevent package re-installation 
-        # IF the environment already exists and is up-to-date.
-        # Note: If dependencies change, tox will re-install them and the cache key will change.
-        tox -e lint,format,pytest
+        poetry run pylint --rc-file=.pylintrc oracle_server/
+        poetry run black oracle_server --check --diff
+        poetry run pytest tests

@@ -1,6 +1,7 @@
 import os
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from dotenv import load_dotenv
+import uvicorn
 from oracle_server.config.hashicorp import OpenBaoApiClient
 
 load_dotenv()
@@ -33,7 +34,6 @@ def _set_secrets():
 
 _set_secrets()
 
-from oracle_server.app import create_app
 
 def main():
     """
@@ -44,11 +44,15 @@ def main():
     parser.add_argument('-n', dest='host', default=FLASK_HOST, help="Hostname")
     parser.add_argument('-p', dest='port', type=int, default=FLASK_PORT, help="Port")
 
-    args, extras = parser.parse_known_args()
+    args = parser.parse_args()
 
-    app = create_app()
-
-    app.run(host=args.host, port=args.port)
+    uvicorn.run(
+        "oracle_server.app:create_app",
+        host=args.host,
+        port=args.port,
+        factory=True,
+        reload=True,
+    )
 
 if __name__ == '__main__':
     main()
