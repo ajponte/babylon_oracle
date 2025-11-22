@@ -1,12 +1,14 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const config = {
   name: 'browser',
   mode: 'development',
-  entry: './src/index.js',
+  entry: ['webpack-hot-middleware/client', './src/index.js'],
   output: {
     path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js',
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -22,6 +24,7 @@ const config = {
       },
     ],
   },
+  plugins: [new webpack.HotModuleReplacementPlugin()],
 };
 
 module.exports = config;

@@ -6,6 +6,7 @@ from typing import Any
 
 import connexion
 from flask import current_app
+from langchain_core.messages import AIMessage
 from oracle_server.handlers.handler import BabylonChatHandler, ChatHandler
 
 _LOGGER = logging.getLogger()
@@ -60,7 +61,11 @@ def _handle_chat_response(event) -> str:
     """Handle chat response object and return the message content as a string."""
     _LOGGER.debug(f"Handling chat response event: {event}")
     try:
-        content = event["messages"][-1].content
+        last_message = event["messages"][-1]
+        if not isinstance(last_message, AIMessage):
+            return ""
+
+        content = last_message.content
 
         if isinstance(content, str):
             return content

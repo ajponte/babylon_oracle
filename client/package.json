@@ -5,7 +5,8 @@
   "scripts": {
     "test": "jest",
     "build": "webpack",
-    "start": "node server.js"
+    "start": "npm run build && node server.js",
+    "start:dev": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,11 +22,13 @@
     "@mui/material": "^7.3.4",
     "axios": "^1.12.2",
     "babel-loader": "^10.0.0",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "webpack": "^5.102.1",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-middleware": "^7.2.1",
+    "webpack-hot-middleware": "^2.26.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.8",
