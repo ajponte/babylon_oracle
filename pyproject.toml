@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Babylon MCP Integration"
 authors = ["Alan Ponte <alanjponte@gmail.com>"]
 readme = "README.md"
-#packages = [{ include = "your_package_name" }]  # or remove if not using a package dir
+packages = [{ include = "oracle_server" }]
 
 [tool.poetry.dependencies]
 python = "^3.13"
