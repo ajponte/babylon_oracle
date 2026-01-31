@@ -23,5 +23,8 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
 
+    - name: List files
+      run: ls -la
+
     - name: Run CI Script
-      run: ./run_ci_client.sh
+      run: bash ./run_ci_client.sh
