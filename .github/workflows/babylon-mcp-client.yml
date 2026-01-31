@@ -27,6 +27,10 @@ jobs:
       run: npm install
       working-directory: ./client
 
+    - name: Build
+      run: npm run build
+      working-directory: ./client
+
     - name: Run tests
       # NOTE: The test command in client/package.json is a placeholder.
       # You will need to update it with your actual test command.
