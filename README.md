@@ -67,3 +67,14 @@ To run the client-side tests, navigate to the `client` directory and run:
 ```shell
 npm test
 ```
+
+## Continuous Integration (CI)
+
+The client project has a Continuous Integration (CI) pipeline configured in `.github/workflows/babylon-mcp-client.yml`. This workflow automates the following steps on every push and pull request to the `main` branch:
+
+1.  **Checkout Code:** Fetches the repository code.
+2.  **Setup Node.js:** Configures the Node.js environment.
+3.  **Install Dependencies:** Installs all necessary `npm` packages located in the `client` directory.
+4.  **Build Application:** Compiles the TypeScript React application using `npm run build`.
+5.  **Run Tests:** Executes the client-side unit tests using `npm test`.
+

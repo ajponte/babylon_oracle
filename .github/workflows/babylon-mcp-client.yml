@@ -23,16 +23,5 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
 
-    - name: Install npm dependencies
-      run: npm install
-      working-directory: ./client
-
-    - name: Build
-      run: npm run build
-      working-directory: ./client
-
-    - name: Run tests
-      # NOTE: The test command in client/package.json is a placeholder.
-      # You will need to update it with your actual test command.
-      run: npm test
-      working-directory: ./client
+    - name: Run CI Script
+      run: ./run_ci_client.sh
