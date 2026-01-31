@@ -1,26 +1,31 @@
 
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Paper, TextField, Button, List, ListItem, ListItemText, Avatar, Grid, CircularProgress } from '@mui/material';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 
+interface Message {
+  text: string;
+  sender: 'user' | 'bot';
+}
+
 const Chatbot = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async () => {
     if (input.trim() === '') return;
 
-    const newMessages = [...messages, { text: input, sender: 'user' }];
+    const newMessages = [...messages, { text: input, sender: 'user' as const }];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5003/api/message', { user_input: input });
-      setMessages(prevMessages => [...prevMessages, { text: response.data.text, sender: 'bot' }]);
-    } catch (error) {
+      const response: AxiosResponse<{text: string}> = await axios.post('http://localhost:5003/api/message', { user_input: input });
+      setMessages(prevMessages => [...prevMessages, { text: response.data.text, sender: 'bot' as const }]);
+    } catch (error: any) {
       console.error('Error sending message:', error);
       if (error.response) {
         console.error('Response data:', error.response.data);
@@ -42,12 +47,12 @@ const Chatbot = () => {
         {messages.map((msg, index) => (
           <ListItem key={index} sx={{ justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
             <Grid container direction={msg.sender === 'user' ? 'row-reverse' : 'row'} alignItems="center" spacing={1}>
-              <Grid item>
+              <Grid>
                 <Avatar sx={{ bgcolor: msg.sender === 'user' ? deepOrange[500] : deepPurple[500] }}>
                   {msg.sender === 'user' ? 'U' : 'B'}
                 </Avatar>
               </Grid>
-              <Grid item>
+              <Grid>
                 <ListItemText
                   primary={msg.text}
                   sx={{
@@ -63,12 +68,12 @@ const Chatbot = () => {
         {loading && (
           <ListItem sx={{ justifyContent: 'flex-start' }}>
             <Grid container direction="row" alignItems="center" spacing={1}>
-              <Grid item>
+              <Grid>
                 <Avatar sx={{ bgcolor: deepPurple[500] }}>
                   {'B'}
                 </Avatar>
               </Grid>
-              <Grid item>
+              <Grid>
                 <CircularProgress size={20} />
               </Grid>
             </Grid>
@@ -76,7 +81,7 @@ const Chatbot = () => {
         )}
       </List>
       <Grid container spacing={1} sx={{ p: 2 }}>
-        <Grid item xs>
+        <Grid xs>
           <TextField
             fullWidth
             label="Type a message"
